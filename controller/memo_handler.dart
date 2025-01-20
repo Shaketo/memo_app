@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:intl/intl.dart';
 import 'package:memo_app/providers/memos_notifier.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:memo_app/controller/memo_handler.dart';
 
 class MemoHandler {
   final memoController = TextEditingController();
@@ -31,20 +31,21 @@ class MemoHandler {
 
   Future<void> saveMemo() async {
     _memo = memoController.text;
-    String date = DateTime.now().toString();
+    String formattedDate = formatDate();
 
     database = await initializeDB();
-    await database.insert('memos', {'memo': _memo, 'date': date});
+    await database.insert('memos', {'memo': _memo, 'date': formattedDate});
   }
 
   Future<void> updateMemo(int id) async {
     _memo = memoController.text;
-    String date = DateTime.now().toString();
+    print('updateMemoの中身：$_memo');
+    String formattedDate = formatDate();
 
     database = await initializeDB();
     await database.update(
       'memos',
-      {'id': id, 'memo': _memo, 'date': date},
+      {'id': id, 'memo': _memo, 'date': formattedDate},
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -56,5 +57,10 @@ class MemoHandler {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  String formatDate() {
+    DateTime date = DateTime.now();
+    return DateFormat('yyyy/MM/dd  kk:mm').format(date);
   }
 }
