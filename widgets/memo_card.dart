@@ -24,14 +24,8 @@ class MemoCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) {
-              return EditPage(id: id, memo: memo);
-            },
-          ),
-        );
+      onTap: () async {
+        _onTap(context, ref);
       },
       onLongPress: () async {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -59,12 +53,34 @@ class MemoCard extends ConsumerWidget {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              Text(memo),
+              Text(memoToShow()),
               Text(date),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String memoToShow() {
+    if (memo.length < 20) {
+      return memo;
+    } else {
+      return '${memo.substring(0, 20)}...';
+    }
+  }
+
+  void _onTap(BuildContext context, WidgetRef ref) async {
+    bool editPagepopped = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return EditPage(id: id, memo: memo);
+        },
+      ),
+    );
+    if (editPagepopped == true) {
+      memoHandler.database = await memoHandler.initializeDB();
+      ref.read(memoDataProvider.notifier).loadMemos(db: memoHandler.database);
+    }
   }
 }
