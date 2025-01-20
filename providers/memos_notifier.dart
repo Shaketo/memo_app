@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -7,8 +6,9 @@ class MemosNotifier extends StateNotifier<List<Map<String, dynamic>>> {
 
   Future<void> loadMemos({db}) async {
     state = await getMemos(db);
+    state = state.reversed.toList();
 
-    print('loadMemoの中');
+    print('loadMemoの中：');
 
     print(state);
   }
